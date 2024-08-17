@@ -227,31 +227,6 @@ def login (request):
 def index(request):
     return render(request, 'relationship_app/index.html')
 
-# def Admin(user):
-#     return hasattr(user,'userprofile') and user.userprofile.role == 'Admin'
-# def Librarian(user):
-#     return hasattr(user,'userprofile') and user.userprofile.role == 'Librarian'
-# def Member(user):
-#     return hasattr(user,'userprofile') and user.userprofile.role == 'Member'
-
-# @user_passes_test(Admin)
-# def admin_view(request):
-#     if not request.user.userprofile.role == 'Admin':
-#         return HttpResponseForbidden("You have no access to this page.")
-#     context = {'message': 'Welcome to the admin view!'}
-#     return render(request, 'relationship_app/admin_view.html',context)
-# @user_passes_test(Librarian)
-# def librarian_view(request):
-#     if not request.user.userprofile.role == 'Librarian':
-#         return HttpResponseForbidden("You have no access to this page.")
-#     context = {'message': 'Welcome to the librarian view!'}
-#     return render(request, 'relationship_app/librarian_view.html', context)
-# @user_passes_test(Member)
-# def member_view(request):
-#     if not request.user.userprofile.role == 'Member':
-#         return HttpResponseForbidden("You have no access to this page.")
-#     context = {'message': 'Welcome to the librarian view!'}
-#     return render(request, 'relationship_app/member_view.html')
 def check_role(user, role):
   return user.is_authenticated and user.userprofile.role == role
 
