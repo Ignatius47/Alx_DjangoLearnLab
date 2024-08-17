@@ -7,7 +7,7 @@ urlpatterns = [
     path('library/<int:pk>/', LibraryDetailView.as_view(), name='library-detail'),
     path('signup/', views.register, name='register'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('admin/', admin_view, name='admin'),
+    path('admin/', admin_view, name='admin-view'),
     path('librarian/', librarian_view, name='librarian'),
     path('member/', member_view, name='member'),
     path('book/add/', add_book, name='add-book'),
