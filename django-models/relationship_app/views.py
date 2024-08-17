@@ -87,6 +87,21 @@ def edit_book(request, pk):
         form = BookForm(instance=book)
     return render(request, 'relationship_app/edit_book.html', {'form': form})
 
+def check_role(user, role):
+  return user.is_authenticated and user.userprofile.role == role
+
+@user_passes_test(lambda user: check_role(user, "Admin"))
+def admin_view(request):
+    return render(request, "relationship_app/admin_view.html")
+
+@user_passes_test(lambda user: check_role(user, "Librarian"))
+def librarian_view(request):
+    return render(request, "relationship_app/librarian_view.html")
+
+@user_passes_test(lambda user: check_role(user, "Member"))
+def member_view(request):
+    return render(request, "relationship_app/member_view.html")
+
 @permission_required('relationship_app.delete_book')
 def delete_book(request, pk):
     book = Book.objects.get(pk=pk)
