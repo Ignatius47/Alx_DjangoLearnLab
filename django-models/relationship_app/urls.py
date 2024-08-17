@@ -13,6 +13,7 @@ urlpatterns = [
     path('book/add/', add_book, name='add-book'),
     path('book/<int:pk>/edit/', edit_book, name='edit-book'),
     path('book/<int:pk>/delete/', delete_book, name='delete-book'),
+    path('signup/', signup, name='register')
     path('login/', LoginView.as_view(template_name='yourapp/login.html'), name='login'),
     path('logout/', LogoutView.as_view(template_name='yourapp/logout.html'), name='logout'),
 ]
