@@ -87,6 +87,33 @@ def edit_book(request, pk):
         form = BookForm(instance=book)
     return render(request, 'relationship_app/edit_book.html', {'form': form})
 
+class register(CreateView):
+    form_class = UserCreationForm()
+    success_url = reverse_lazy('login')
+    template_name = 'relationship_app/register.html'
+    
+def login (request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('/books/')  #redirects user towards the books page.
+            else:
+                return HttpResponse("Invalid credentials", status=401)
+        else:
+            return HttpResponse("Invalid form data", status=400)
+    else:
+        form = AuthenticationForm()
+    return render(request, 'relationship_app/login.html', {'form': form})
+    
+def index(request):
+    return render(request, 'relationship_app/index.html')
+
+
 def check_role(user, role):
   return user.is_authenticated and user.userprofile.role == role
 
