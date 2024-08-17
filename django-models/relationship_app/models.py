@@ -50,6 +50,7 @@ class UserProfile(models.Model):
         ('ADMIN', 'Admin'),
         ('LIBRARIAN', 'Librarian'),
         ('PATRON', 'Patron'),
+        ('MEMBER', 'Member'),
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='PATRON')
