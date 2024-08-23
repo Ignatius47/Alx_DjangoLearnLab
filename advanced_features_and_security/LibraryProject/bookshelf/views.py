@@ -5,6 +5,10 @@ from bookshelf.models import Book
 
 delete_book = Book.objects.delete(title = "Nineteen Eighty-Four")
 
+def book_list(request):
+    books = Book.objects.all()  # Retrieve all books from the database
+    return render(request, 'bookshelf/book_list.html', {'books': books})
+     
 # This decorator checks if the user has the 'can_edit' permission
 @permission_required('realationship_app.can_edit', raise_exception=True)
 def edit_view(request):
