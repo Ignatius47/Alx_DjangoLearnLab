@@ -57,6 +57,34 @@ AUTH_USER_MODEL = 'relationship_app.CustomUser'
 
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
+SECURE_BROWSER_XSS_FILTER = True
+
+X_FRAME_OPTIONS = 'DENY'
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
+
+# Enforce HTTPS across the entire site
+SECURE_SSL_REDIRECT = True
+
+# HSTS settings for enforcing HTTPS
+SECURE_HSTS_SECONDS = 31536000  # One year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Include subdomains in HSTS policy
+SECURE_HSTS_PRELOAD = True  # Allow preloading
+
+# Secure cookies settings
+SESSION_COOKIE_SECURE = True  # Session cookies should only be sent over HTTPS
+CSRF_COOKIE_SECURE = True  # CSRF cookies should only be sent over HTTPS
+
+# Secure headers
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME sniffing
+SECURE_BROWSER_XSS_FILTER = True  # Enable XSS filter
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
