@@ -10,7 +10,7 @@ from .serializers import BookSerializer
 from rest_framework import viewsets, permissions
 from .permissions import IsOwnerOrReadOnly
 
-class BookListViewSet(viewsets.ModelViewset):
+class BookViewSet(viewsets.ModelViewset):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permissions = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
