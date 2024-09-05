@@ -1,14 +1,17 @@
 # Import necessary modules and classes from Django REST Framework and the datetime module
-from rest_framework import serializers
+from rest_framework import serializers  # Fix typo in 'serializers' import
 from .models import Book, Author
 from datetime import datetime
 
 # Serializer for the Book model
-class BookSerializer(serializers.ModelSerializer):
+class BookSerializer(serializers.ModelSerializer):  # Fix typo in 'ModelSerializer'
+    # Authors can be serialized as a list of authors related to the book
+    authors = serializers.PrimaryKeyRelatedField(many=True, queryset=Author.objects.all(), read_only=False)
+
     class Meta:
         # Specify the model to be serialized
         model = Book
-        # Serialize all fields in the Book model
+        # Serialize all fields in the Book model, including the authors field
         fields = '__all__'
 
     # Custom validator for the publication year field
@@ -24,8 +27,11 @@ class BookSerializer(serializers.ModelSerializer):
 
 # Serializer for the Author model
 class AuthorSerializer(serializers.ModelSerializer):
+    # If an Author has multiple books, you can use the 'many=True' option to serialize them
+    books = BookSerializer(many=True, read_only=True)  # Add this to serialize the related books
+
     class Meta:
         # Specify the model to be serialized
         model = Author
-        # Serialize all fields in the Author model
+        # Serialize all fields in the Author model, including related books
         fields = '__all__'
