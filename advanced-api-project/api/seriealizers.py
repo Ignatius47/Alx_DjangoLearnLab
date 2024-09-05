@@ -1,10 +1,10 @@
 # Import necessary modules and classes from Django REST Framework and the datetime module
-from rest_framework import serializers  # Fix typo in 'serializers' import
+from rest_framework import serializers
 from .models import Book, Author
 from datetime import datetime
 
 # Serializer for the Book model
-class BookSerializer(serializers.ModelSerializer):  # Fix typo in 'ModelSerializer'
+class BookSerializer(serializers.ModelSerializer):
     # Authors can be serialized as a list of authors related to the book
     authors = serializers.PrimaryKeyRelatedField(many=True, queryset=Author.objects.all(), read_only=False)
 
