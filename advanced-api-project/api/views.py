@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from datetime import datetime
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAuthenticated
 
 # ListView to retrieve all Book records
 class BookListView(generics.ListAPIView):
