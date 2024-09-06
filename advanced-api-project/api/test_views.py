@@ -2,7 +2,8 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Book, Author
-
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 class BookAPITestCase(APITestCase):
 
@@ -13,7 +14,13 @@ class BookAPITestCase(APITestCase):
             publication_year=2023,
             author=self.author
         )
-        self.book_url = reverse('book-detail', kwargs={'id': self.book.id})
+        self.book_url = reverse('book-detail', kwargs={'pk': self.book.pk})
+
+        # Create a user and log them in
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
 
     # Test for creating a book
     def test_create_book(self):
@@ -71,3 +78,30 @@ class BookAPITestCase(APITestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    # Test for creating a book
+    def test_create_book(self):
+        url = reverse('book-list')
+        data = {
+            'title': 'New Book',
+            'publication_year': 2022,
+            'author': self.author.id
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Book.objects.count(), 2)
+        self.assertEqual(Book.objects.get(id=2).title, 'New Book')
+
+    # Test for authentication required for creating a book
+    def test_authentication_required(self):
+        self.client.credentials()  # Remove authentication
+        url = reverse('book-list')
+        data = {
+            'title': 'Unauthorized Book',
+            'publication_year': 2022,
+            'author': self.author.id
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
