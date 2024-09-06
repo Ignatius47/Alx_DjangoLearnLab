@@ -7,14 +7,25 @@ from datetime import datetime
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 # ListView to retrieve all Book records
 class BookListView(generics.ListAPIView):
     """
     Retrieves the list of all books from the database.
     """
-    queryset = Book.objects.all()  # Fetches all books
-    serializer_class = BookSerializer  # Serializer to format the data
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    # Combine filtering, searching, and ordering into one filter_backends definition
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    
+    # Define filter fields, search fields, and ordering fields
+    filterset_fields = ['title', 'author', 'publication_year']
+    search_fields = ['title', 'author__name']  # Assuming 'author' is a related model
+    ordering_fields = ['title', 'publication_year']
+    
 
 # DetailView to retrieve a single Book by its ID
 class BookDetailView(generics.RetrieveAPIView):
