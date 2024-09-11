@@ -1,0 +1,52 @@
+<!-- blog/templates/blog/profile.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2>Profile</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username:</label>
+                {{ user_form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                {{ user_form.email }}
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Bio:</label>
+                {{ profile_form.bio }}
+            </div>
+
+            <div class="form-group">
+                <label for="profile_picture">Profile Picture:</label>
+                {% if request.user.profile.profile_picture %}
+                    <img src="{{ request.user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
+                {% endif %}
+                {{ profile_form.profile_picture }}
+            </div>
+
+            <button type="submit" class="btn">Update Profile</button>
+        </form>
+    </div>
+</body>
+</html>
