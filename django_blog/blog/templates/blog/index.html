@@ -12,7 +12,12 @@
     <header>
         <h1>Welcome to My Django Blog</h1>
     </header>
-
+    
+    <form method="get" action="{% url 'search' %}">
+        <input type="text" name="q" placeholder="Search posts...">
+        <button type="submit">Search</button>
+    </form>
+    
     <div id="content">
         <p>This is a sample blog post content.</p>
     </div>
