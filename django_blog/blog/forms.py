@@ -8,9 +8,9 @@ from taggit.forms import TagWidget
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'tags']  # Include 'tags'
+        fields = ['title', 'content', 'tags']  # Include 'tags' in the form
         widgets = {
-            'tags': TagWidget(attrs={'class': 'form-control'})  # Use TagWidget here
+            'tags': TagWidget(),  # Apply TagWidget to the tags field
         }
 
     def save(self, commit=True):
@@ -18,13 +18,13 @@ class PostForm(forms.ModelForm):
         post.author = self.request.user  # Assuming request.user is passed to the form
         if commit:
             post.save()
-            self.save_m2m()  # Save many-to-many relationships like tags
+            self.save_m2m()  # To save the tags (many-to-many relationship)
         return post
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-
+        self.fields['tags'].widget = TagWidget()  # Ensure TagWidget is used for 'tags'
         
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
