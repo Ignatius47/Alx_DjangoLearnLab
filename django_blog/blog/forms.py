@@ -7,20 +7,23 @@ from .models import Profile, Post, Comment, Tag
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'tags']  # Include 'tags' here
+        fields = ['title', 'content', 'tags']  # Include 'tags'
+        widgets = {
+            'tags': TagWidget(attrs={'class': 'form-control'})  # Use TagWidget here
+        }
 
     def save(self, commit=True):
         post = super().save(commit=False)
-        post.author = self.request.user  # Assuming request.user is available in the view
+        post.author = self.request.user  # Assuming request.user is passed to the form
         if commit:
             post.save()
-            self.save_m2m()  # For saving many-to-many relations like tags
+            self.save_m2m()  # Save many-to-many relationships like tags
         return post
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)  # Ensure request is passed to the form
+        self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-        self.fields['tags'].widget.attrs.update({'class': 'form-control'})
+
         
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
