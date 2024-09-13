@@ -5,26 +5,23 @@ from .models import Profile, Post, Comment, Tag
 
 
 class PostForm(forms.ModelForm):
-    tags = forms.ModelMultipleChoiceField(
-        queryset=Tag.objects.all(),
-        widget=forms.CheckboxSelectMultiple()
-    )
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'tags']  # Include 'tags' here
 
     def save(self, commit=True):
         post = super().save(commit=False)
-        post.author = self.request.user
-        post.save()
-        post.tags.set(self.cleaned_data['tags'])
+        post.author = self.request.user  # Assuming request.user is available in the view
+        if commit:
+            post.save()
+            self.save_m2m()  # For saving many-to-many relations like tags
         return post
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)  # Ensure request is passed to the form
         super().__init__(*args, **kwargs)
-        self.fields['author'].widget = forms.HiddenInput()
-        self.fields['author'].initial = self.request.user.pk
-
+        self.fields['tags'].widget.attrs.update({'class': 'form-control'})
+        
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
 
