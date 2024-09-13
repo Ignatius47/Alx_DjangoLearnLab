@@ -10,11 +10,17 @@ from django.db.models import Q
 def search(request):
     query = request.GET.get('q')
     if query:
-        posts = Post.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
+        # Search for posts where title, content, or tags match the query
+        posts = Post.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)  # Search for matching tags
+        ).distinct()
     else:
         posts = Post.objects.all()
+    
     return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
-
+    
 def posts_by_tag(request, tag_name):
     tag = get_object_or_404(Tag, name= tag_name)
     posts = tag.posts.all()
