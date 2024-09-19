@@ -13,6 +13,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 # Serializer for registering a new user
 class RegisterSerializer(serializers.ModelSerializer):
+    # Use CharField for password to ensure it is treated as a string and add validation rules
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})  # Password field should not be readable
+
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'bio', 'profile_picture')
@@ -20,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     # Overriding the create method to handle user creation
     def create(self, validated_data):
-        # Use get to handle optional fields like 'bio' and 'profile_picture'
+        # Use get_user_model().objects.create_user to create the user
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
