@@ -13,8 +13,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 # Serializer for user registration
 class RegisterSerializer(serializers.ModelSerializer):
-    # Explicitly define password as a CharField to control validation and input type
-    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    # Define password as a CharField to control validation and input type
+    password = serializers.CharField()
 
     class Meta:
         model = User
