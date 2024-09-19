@@ -1,37 +1,37 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from rest_framework.authtoken.models import Token  # Import Token for token authentication
+from rest_framework.authtoken.models import Token  # For token creation
 
 # Get the custom user model
 User = get_user_model()
 
-# Serializer for the User model
+# Serializer for the User model (viewing user details)
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'bio', 'profile_picture', 'followers')  # Corrected 'prrofile_picture' to 'profile_picture'
+        fields = ('id', 'username', 'bio', 'profile_picture', 'followers')
 
-# Serializer for registering a new user
+# Serializer for user registration
 class RegisterSerializer(serializers.ModelSerializer):
-    # Use CharField for password to ensure it is treated as a string and add validation rules
-    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})  # Password field should not be readable
+    # Explicitly define password as a CharField to control validation and input type
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
 
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'bio', 'profile_picture')
-        extra_kwargs = {'password': {'write_only': True}}  # Ensure password is write-only
+        extra_kwargs = {
+            'password': {'write_only': True}  # Ensure password is not returned in responses
+        }
 
-    # Overriding the create method to handle user creation
+    # Override the create method to handle user creation
     def create(self, validated_data):
         # Use get_user_model().objects.create_user to create the user
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
-            bio=validated_data.get('bio', ''),  # Defaults to an empty string if not provided
-            profile_picture=validated_data.get('profile_picture', None)  # Defaults to None if not provided
+            bio=validated_data.get('bio', ''),  # Optional field with default
+            profile_picture=validated_data.get('profile_picture', None)  # Optional field with default
         )
-
         # Create a token for the new user
         Token.objects.create(user=user)
-
         return user
