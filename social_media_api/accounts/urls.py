@@ -9,4 +9,6 @@ urlpatterns = [
     path('register/', RegisterAPIView.as_view(), name='register'),
     path('login/', LoginAPIView.as_view(), name='login'),
     path('', include(router.urls)),
+    path('unfollow/<int:user_id>/', FollowViewSet.as_view({'post': 'unfollow'}), name='unfollow'),
+    path('follow/<int:user_id>/', FollowViewSet.as_view({'post': 'follow'}), name='follow'),
 ]
