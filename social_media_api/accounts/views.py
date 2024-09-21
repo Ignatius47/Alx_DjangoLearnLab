@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
@@ -11,21 +11,25 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class RegisterAPIView(APIView):
+# Registration view using GenericAPIView
+class RegisterAPIView(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
+
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            if user:
-                token = Token.objects.create(user=user)
-                return Response({
-                    'user': UserSerializer(user, context={'request': request}).data,
-                    'token': token.key
-                }, status=status.HTTP_201_CREATED)
+            token = Token.objects.create(user=user)
+            return Response({
+                'user': UserSerializer(user, context={'request': request}).data,
+                'token': token.key
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
-class LoginAPIView(APIView):
+# Login view using GenericAPIView
+class LoginAPIView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -36,19 +40,20 @@ class LoginAPIView(APIView):
                 'user': UserSerializer(user, context={'request': request}).data,
                 'token': token.key
             }, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+# Follow and Unfollow viewset
 class FollowViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
+    # Follow a user
     @action(detail=True, methods=['post'])
     def follow(self, request, pk=None):
         user_to_follow = get_object_or_404(User, pk=pk)
         request.user.following.add(user_to_follow)  # Ensure `following` is a ManyToMany field
         return Response({'status': 'followed'}, status=status.HTTP_200_OK)
 
+    # Unfollow a user
     @action(detail=True, methods=['post'])
     def unfollow(self, request, pk=None):
         user_to_unfollow = get_object_or_404(User, pk=pk)
