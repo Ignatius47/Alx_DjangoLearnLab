@@ -62,4 +62,4 @@ class FollowViewSet(viewsets.ViewSet):
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = permissions.IsAuthenticated
