@@ -1,10 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework import status
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from .serializers import RegisterSerializer, UserSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class RegisterAPIView(APIView):
     def post(self, request):
@@ -14,22 +19,38 @@ class RegisterAPIView(APIView):
             if user:
                 token = Token.objects.create(user=user)
                 return Response({
-                    'user': UserSerializer(user, context=self.context).data,
+                    'user': UserSerializer(user, context={'request': request}).data,
                     'token': token.key
                 }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
 class LoginAPIView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
-            token = Token.objects.create(user=user)
+            token, created = Token.objects.get_or_create(user=user)
             return Response({
-                'user': UserSerializer(user, context=self.context).data,
+                'user': UserSerializer(user, context={'request': request}).data,
                 'token': token.key
             }, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        
 
+class FollowViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['post'])
+    def follow(self, request, pk=None):
+        user_to_follow = get_object_or_404(User, pk=pk)
+        request.user.following.add(user_to_follow)  # Ensure `following` is a ManyToMany field
+        return Response({'status': 'followed'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def unfollow(self, request, pk=None):
+        user_to_unfollow = get_object_or_404(User, pk=pk)
+        request.user.following.remove(user_to_unfollow)  # Ensure `following` is a ManyToMany field
+        return Response({'status': 'unfollowed'}, status=status.HTTP_200_OK)
