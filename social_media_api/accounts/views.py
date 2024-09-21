@@ -1,17 +1,16 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from .serializers import RegisterSerializer, UserSerializer
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+# Ensure you're using the custom user model
+CustomUser = get_user_model()
 
-# Registration view using GenericAPIView
+# Registration view
 class RegisterAPIView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
@@ -26,7 +25,7 @@ class RegisterAPIView(generics.GenericAPIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Login view using GenericAPIView
+# Login view
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = UserSerializer
 
@@ -49,13 +48,18 @@ class FollowViewSet(viewsets.ViewSet):
     # Follow a user
     @action(detail=True, methods=['post'])
     def follow(self, request, pk=None):
-        user_to_follow = get_object_or_404(User, pk=pk)
+        user_to_follow = get_object_or_404(CustomUser, pk=pk)
         request.user.following.add(user_to_follow)  # Ensure `following` is a ManyToMany field
         return Response({'status': 'followed'}, status=status.HTTP_200_OK)
 
     # Unfollow a user
     @action(detail=True, methods=['post'])
     def unfollow(self, request, pk=None):
-        user_to_unfollow = get_object_or_404(User, pk=pk)
+        user_to_unfollow = get_object_or_404(CustomUser, pk=pk)
         request.user.following.remove(user_to_unfollow)  # Ensure `following` is a ManyToMany field
         return Response({'status': 'unfollowed'}, status=status.HTTP_200_OK)
+
+class UserListView(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
