@@ -53,6 +53,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 class FeedView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        # Get the current user's following list
+        following_users = request.user.following.all()  # Assuming `following` is a ManyToManyField to User
+
+        # Fetch posts from the users they are following, ordered by creation date
+        posts = Post.objects.filter(author__in=following_users).order_by('-created_at')  # Adjust `created_at` to your Post model's date field
+
+        # Serialize the posts (assuming you have a PostSerializer)
+        serializer = PostSerializer(posts, many=True)
+        
+        return Response(serializer.data, status=200)
+
     def list(self, request):
         posts = Post.objects.filter(author__in=request.user.following.all()).order_by('-created_at')
         serializer = PostSerializer(posts, many=True)
