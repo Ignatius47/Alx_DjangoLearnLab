@@ -106,6 +106,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Add STATIC_ROOT for production use
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # This is the folder where collectstatic will put your files
+
+# Optional: If you have additional directories for static files in development
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # This is typically where your static files for development are stored
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
